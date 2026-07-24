@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Edit Officer</title>
+<link
+rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container mt-5">
+
+<h2>Edit Officer</h2>
+
+<form action="/officers/update/<%= officer.id %>" method="POST">
+
+<div class="mb-3">
+<label>Badge Number</label>
+<input
+type="text"
+name="badge_number"
+class="form-control"
+value="<%= officer.badge_number %>"
+required>
+</div>
+
+<div class="mb-3">
+<label>Full Name</label>
+<input
+type="text"
+name="full_name"
+class="form-control"
+value="<%= officer.full_name %>"
+required>
+</div>
+
+<div class="mb-3">
+<label>Rank</label>
+
+<select name="rank" class="form-control">
+
+<option value="Inspector" <%= officer.rank === 'Inspector' ? 'selected' : '' %>>Inspector</option>
+
+<option value="Assistant Inspector" <%= officer.rank === 'Assistant Inspector' ? 'selected' : '' %>>Assistant Inspector</option>
+
+<option value="Sergeant" <%= officer.rank === 'Sergeant' ? 'selected' : '' %>>Sergeant</option>
+
+<option value="Corporal" <%= officer.rank === 'Corporal' ? 'selected' : '' %>>Corporal</option>
+
+<option value="Constable" <%= officer.rank === 'Constable' ? 'selected' : '' %>>Constable</option>
+
+<option value="Detective" <%= officer.rank === 'Detective' ? 'selected' : '' %>>Detective</option>
+
+<option value="Station Commander" <%= officer.rank === 'Station Commander' ? 'selected' : '' %>>Station Commander</option>
+
+<option value="OC CID" <%= officer.rank === 'OC CID' ? 'selected' : '' %>>OC CID</option>
+
+<option value="DPC" <%= officer.rank === 'DPC' ? 'selected' : '' %>>DPC</option>
+
+</select>
+</div>
+
+<div class="mb-3">
+<label>Phone</label>
+<input
+type="text"
+name="phone"
+class="form-control"
+value="<%= officer.phone %>">
+</div>
+
+<div class="mb-3">
+<label>Department</label>
+
+<select name="department" class="form-control">
+
+<option value="Criminal Investigations Department (CID)" <%= officer.department === 'Criminal Investigations Department (CID)' ? 'selected' : '' %>>
+Criminal Investigations Department (CID)
+</option>
+
+<option value="Traffic Police" <%= officer.department === 'Traffic Police' ? 'selected' : '' %>>
+Traffic Police
+</option>
+
+<option value="Community Policing" <%= officer.department === 'Community Policing' ? 'selected' : '' %>>
+Community Policing
+</option>
+
+<option value="Operations" <%= officer.department === 'Operations' ? 'selected' : '' %>>
+Operations
+</option>
+
+<option value="Administration" <%= officer.department === 'Administration' ? 'selected' : '' %>>
+Administration
+</option>
+
+<option value="Crime Intelligence" <%= officer.department === 'Crime Intelligence' ? 'selected' : '' %>>
+Crime Intelligence
+</option>
+
+<option value="Child and Family Protection Unit" <%= officer.department === 'Child and Family Protection Unit' ? 'selected' : '' %>>
+Child and Family Protection Unit
+</option>
+
+<option value="Cyber Crime Unit" <%= officer.department === 'Cyber Crime Unit' ? 'selected' : '' %>>
+Cyber Crime Unit
+</option>
+
+<option value="Forensics" <%= officer.department === 'Forensics' ? 'selected' : '' %>>
+Forensics
+</option>
+
+</select>
+
+</div>
+
+<div class="mb-3 text-center">
+
+    <label class="form-label">Current Photo</label><br>
+
+    <% if (officer.photo) { %>
+        <img
+            src="<%= officer.photo %>"
+            class="img-thumbnail"
+            style="width:180px;height:180px;object-fit:cover;border-radius:50%;">
+    <% } else { %>
+        <p class="text-muted">No photo available.</p>
+    <% } %>
+
+</div>
+<div class="mb-3">
+
+    <label class="form-label">
+        Change Photo (Optional)
+    </label>
+
+    <input
+        type="file"
+        id="photoInput"
+        class="form-control"
+        accept="image/*">
+
+</div>
+
+<div class="mt-3 text-center">
+
+    <img
+        id="preview"
+        style="max-width:300px; display:none;">
+
+</div>
+
+<input
+type="hidden"
+name="croppedPhoto"
+id="croppedPhoto">
+
+<button class="btn btn-primary">
+Update Officer
+</button>
+
+<a href="/officers" class="btn btn-secondary">
+Cancel
+</a>
+
+</form>
+
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+<script>
+let cropper;
+
+const photoInput = document.getElementById("photoInput");
+const preview = document.getElementById("preview");
+const croppedPhoto = document.getElementById("croppedPhoto");
+
+photoInput.addEventListener("change", function (e) {
+
+    const file = e.target.files[0];
+
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = function (event) {
+
+        preview.src = event.target.result;
+        preview.style.display = "block";
+
+        if (cropper) {
+            cropper.destroy();
+        }
+
+        cropper = new Cropper(preview, {
+            aspectRatio: 1,
+            viewMode: 1,
+            dragMode: "move",
+            cropBoxResizable: true,
+            movable: true,
+            zoomable: true,
+            scalable: true,
+            rotatable: false
+        });
+
+    };
+
+    reader.readAsDataURL(file);
+
+});
+
+document.querySelector("form").addEventListener("submit", function () {
+
+    if (!cropper) return;
+
+    const canvas = cropper.getCroppedCanvas({
+        width: 300,
+        height: 300
+    });
+
+    croppedPhoto.value = canvas.toDataURL("image/jpeg");
+
+});
+</script>
+</body>
+</html>
